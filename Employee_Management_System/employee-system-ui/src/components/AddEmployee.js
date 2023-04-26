@@ -1,20 +1,23 @@
 import React, { useState } from 'react'
 import EmployeeService from '../services/EmployeeService';
+import { useNavigate } from 'react-router-dom';
 
 const AddEmployee = () => {
 
-    const [employee, setemployee] = useState({
+    const [employee, setEmployee] = useState({
         id:"",
         firstName:"",
         lastName:"",
         emailId:""
     })
 
+    const navigate = useNavigate();
+
     const handleChange = (e) => {
         const value = e.target.value;
         //set value to the state alongside existing values(...)
         //whenever there is a change in the input fields this updates the state as well for all fname, lname, emailId
-        setemployee({...employee, [e.target.name]: value});
+        setEmployee({...employee, [e.target.name]: value});
     }
 
     const saveEmployee = (e) => {
@@ -23,10 +26,22 @@ const AddEmployee = () => {
         EmployeeService.saveEmployee(employee)
         .then((response) => {
             console.log(response);
+            navigate("/employeeList");
         })
         .catch((error) => {
             console.log(error);
         });
+    }
+
+    const reset = (e) => {
+        e.preventDefault();
+        setEmployee({
+            id:"",
+        firstName:"",
+        lastName:"",
+        emailId:""
+        })
+
     }
 
   return (
@@ -77,7 +92,9 @@ const AddEmployee = () => {
                 className="rounded text-white font-semibold bg-green-400 py-2 px-6 hover:bg-green-700">
                     Save
                     </button>
-                    <button className="rounded text-white font-semibold bg-red-400 py-2 px-6 hover:bg-red-700">
+                    <button 
+                    onClick={reset}
+                    className="rounded text-white font-semibold bg-red-400 py-2 px-6 hover:bg-red-700">
                     Clear
                     </button>
             </div>

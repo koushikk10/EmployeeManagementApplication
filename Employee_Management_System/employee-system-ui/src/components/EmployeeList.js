@@ -1,9 +1,41 @@
-import React from "react";
+import React, {useState, useEffect} from "react";
 import { useNavigate } from "react-router-dom";
+import EmployeeService from '../services/EmployeeService';
+import Employee from "./Employee";
 
 const EmployeeList = () => {
 
     const navigate = useNavigate();
+
+    //To handle loading, by default it is set to true. to check if the data is loaded or not
+    const [loading, setloading] = useState(true)
+    const [employees, setEmployees] = useState(null);
+//To save the data from backend API, [] - empty array
+    useEffect(() => {
+     const fetchData = async () => {
+         setloading(true);
+         try{
+            const response = await EmployeeService.getEmployees();
+            setEmployees(response.data);
+         } catch(error) {
+             console.log(error);
+         }
+         setloading(false);
+     }
+     fetchData();
+    }, []);
+
+    const deleteEmployee = (e, id) => {
+        e.preventDefault();
+        EmployeeService.deleteEmployee(id).then((res) => {
+            if(employees){
+                setEmployees((prevElement) => {
+                    return prevElement.filter((employee => employee.id !== id));
+                });
+            }
+        });
+    };
+    
 
   return (
     <div className="container mx-auto my-8">
@@ -25,31 +57,17 @@ const EmployeeList = () => {
                       <th className="text-right font-medium text-gray-500 uppercase tracking-wider py-3 px-6">Actions</th>
                   </tr>
               </thead>
+              {/* Loading should be completed to get the emp data and display */}
+              {!loading && (
               <tbody className="bg-white">
-                  <tr>
-                      <td className="text-left px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-500">Koushik</div>
-                          </td>
-                      <td className="text-left px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-500">Karre</div>
-                      </td>
-                      <td className="text-left px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-500">koushik@gmail.com</div>
-                          </td>
-                      <td className="text-right px-6 py-4 whitespace-nowrap font-medium text-sm">
-                          <a 
-                          href="#" 
-                          className="text-indigo-600 hover:text-indigo-800 px-4">
-                              Edit
-                              </a>
-                          <a 
-                          href="#"
-                              className="text-indigo-600 hover:text-indigo-800">
-                              Delete
-                              </a>
-                      </td>
-                  </tr>
-              </tbody>
+                  {employees.map((employee) => (
+                    //   Use props 
+                   <Employee 
+                   employee={employee} 
+                   deleteEmployee={deleteEmployee}
+                   key={employee.id}></Employee>
+                  ))}
+              </tbody>)}
           </table>
       </div>
     </div>
