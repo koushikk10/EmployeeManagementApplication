@@ -35,7 +35,7 @@ const UpdateEmployee = () => {
 
     const updateEmployee = (e) => {
         e.preventDefault();
-        EmployeeService.UpdateEmployee(employee, id)
+        EmployeeService.updateEmployee(employee, id)
         .then((response) => {
             navigate("/employeeList");
         })
